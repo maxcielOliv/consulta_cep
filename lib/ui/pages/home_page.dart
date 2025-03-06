@@ -9,15 +9,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final textCep = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+  String result = "";
+
+  Future<void> constultaCep() async {
+    final cepInfo = await consultar(textCep.text);
+    setState(() {
+      result =
+          "CEP: ${cepInfo.cep}\n"
+          "Logradouro: ${cepInfo.logradouro}\n"
+          "Bairro: ${cepInfo.bairro}\n"
+          "Cidade: ${cepInfo.localidade} - ${cepInfo.uf}";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final textCep = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-    String result = "";
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text("Consulta CEP"),
+        title: Text("Consulta CEP", style: TextStyle(
+          color: Theme.of(context).primaryColor
+        ),),
       ),
       body: Center(
         child: Form(
@@ -46,17 +60,13 @@ class _HomePageState extends State<HomePage> {
               ElevatedButton(
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
-                     final cepInfo = await consultar(textCep.text);
-                     setState(() {
-                       result = "CEP: ${cepInfo.bairro}\n"
-                        "Logradouro: ${cepInfo.logradouro}\n"
-                        "Bairro: ${cepInfo.bairro}\n"
-                        "Cidade: ${cepInfo.localidade} - ${cepInfo.uf}";
-                     });
+                    constultaCep();
                   }
                 },
                 child: Text('Consultar'),
               ),
+              const SizedBox(height: 30),
+              Text(result),
             ],
           ),
         ),
