@@ -1,5 +1,7 @@
+import 'package:brasil_fields/brasil_fields.dart';
 import 'package:consulta_cep/services/cep_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,7 +16,7 @@ class _HomePageState extends State<HomePage> {
   String result = "";
 
   Future<void> constultaCep() async {
-    final cepInfo = await consultar(textCep.text);
+    final cepInfo = await consultar(textCep.text.replaceAll(RegExp(r'[.-]'), ''));
     setState(() {
       result =
           "CEP: ${cepInfo.cep}\n"
@@ -29,8 +31,10 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
+        centerTitle: true,
         title: Text("Consulta CEP", style: TextStyle(
-          color: Theme.of(context).primaryColor
+          color: Theme.of(context).primaryColorDark,
+          fontFamily: 'Anton'
         ),),
       ),
       body: Center(
@@ -43,11 +47,16 @@ class _HomePageState extends State<HomePage> {
                 width: 400,
                 child: TextFormField(
                   controller: textCep,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    CepInputFormatter(),
+                  ],
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    label: Text('CEP'),
+                    label: Text('CEP', style: TextStyle(fontFamily: 'Anton'),),
                   ),
                   validator: (value) {
+
                     if (value == null || value.isEmpty) {
                       return 'CEP não informado!';
                     }
@@ -63,7 +72,9 @@ class _HomePageState extends State<HomePage> {
                     constultaCep();
                   }
                 },
-                child: Text('Consultar'),
+                child: Text('Consultar', style: TextStyle(
+                  fontFamily: 'Anton'
+                ),),
               ),
               const SizedBox(height: 30),
               Text(result),
